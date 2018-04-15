@@ -31,17 +31,6 @@ provider:
   memorySize: 512
   timeout: 60
 
-# you can add statements to the Lambda function's IAM Role here
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:PutObject"
-#      Resource:
-#        Fn::Join:
-#          - ""
-#          - - "arn:aws:s3:::"
-#            - "Ref" : "ServerlessDeploymentBucket"
-#            - "/*"
-
 # you can define service wide environment variables here
 #  environment:
 #    variable1: value1
@@ -56,14 +45,19 @@ package:
     - node_modules/**
 
 functions:
+  patch-asg:
+    handler: patch_asg.handler
+
   find-unavailable-instance-types:
-    handler: functions.find_unavailable_instance_types
+    handler: find_unavailable_instance_types.handler
     iamRoleStatements:
         - Effect: "Allow"
           Action:
               - "autoscaling:DescribeLaunchConfigurations"
+              - "autoscaling:DescribeAutoScalingGroups"
               - "ec2:DescribeAvailabilityZones"
               - "ec2:DescribeSpotPriceHistory"
+              - "lambda:InvokeFunction"
           Resource: "*"
     events:
 #      - http:

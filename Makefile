@@ -13,7 +13,7 @@ DOCKERARGS := -e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
 
 SLS := sudo docker run $(DOCKERARGS) -it --rm $(IMAGE)
 
-FUNCTIONS := find-unavailable-instance-types
+FUNCTIONS := find-unavailable-instance-types patch-asg
 
 DOCKER := sudo docker
 
@@ -37,8 +37,11 @@ bash: build
 deploy: build
 	$(SLS) deploy
 
-$(FUNCTIONS): %: deploy-% invoke-% invoke-local-%
+$(FUNCTIONS): %: deploy-% invoke-% invoke-local-% logs-%
 .PHONY: $(FUNCTIONS)
+
+logs-%: build
+	$(SLS) logs -f $* -t
 
 deploy-%: build
 	$(SLS) deploy function -f $*

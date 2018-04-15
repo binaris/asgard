@@ -1,8 +1,8 @@
 import json
 import pprint
-import traceback
 from datetime import datetime, timedelta
 import boto3
+from utils import http_error_handling, invoke
 
 def list_azs(region):
     client = boto3.client("ec2", region_name = region)
@@ -66,21 +66,6 @@ def find_types_missing_in_azs(used_types, azs, available_types):
                     ret[used_type].append(az)
     return ret
 
-def http_error_handling(func):
-    def func_wrapper(*args, **kwds):
-        try:
-            ret = func(*args, **kwds)
-            return {
-                "statusCode": 200,
-                "body": ret,
-            }
-        except Exception as e:
-            return {
-                "statusCode": 500,
-                "body": traceback.format_exc(),
-            }
-    return func_wrapper
-
 def list_asgs(region):
 
     client = boto3.client('autoscaling', region_name = region)
@@ -97,20 +82,22 @@ def list_asgs(region):
     return asgs
 
 @http_error_handling
-def find_unavailable_instance_types(event, context):
+def handler(event, context):
     region = event['region']
     if not region:
         raise Exception('region must be passed in')
 
-    print("Looking for instance types used in region %s" % region)
-    used_types = find_lc_instance_types(region)
-    print("Instance types used in region %s: %s" % (region, ",".join(used_types)))
-    azs = list_azs(region)
-    print("AZs in region %s: %s" % (region, ",".join(azs)))
-    history = get_spot_history(region, used_types)
-    print("Spots available in each AZ: %s" % json.dumps(history, indent=1))
-    unavailable_types = find_types_missing_in_azs(used_types, azs, history)
+    # print("Looking for instance types used in region %s" % region)
+    # used_types = find_lc_instance_types(region)
+    # print("Instance types used in region %s: %s" % (region, ",".join(used_types)))
+    # azs = list_azs(region)
+    # print("AZs in region %s: %s" % (region, ",".join(azs)))
+    # history = get_spot_history(region, used_types)
+    # print("Spots available in each AZ: %s" % json.dumps(history, indent=1))
+    # unavailable_types = find_types_missing_in_azs(used_types, azs, history)
 
-    pprint.pprint(list_asgs(region))
-    return unavailable_types
+    asgs = list_asgs(region)
+    for asg in asgs:
+        invoke("asgard-dev-patch-asg", asg);
+    return asgs
 
