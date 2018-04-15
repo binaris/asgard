@@ -13,7 +13,7 @@ DOCKERARGS := -e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
 
 SLS := sudo docker run $(DOCKERARGS) -it --rm $(IMAGE)
 
-FUNCTIONS := find-used-instance-types
+FUNCTIONS := find-unavailable-instance-types
 
 DOCKER := sudo docker
 
@@ -27,7 +27,7 @@ invoke-local-%:
 invoke-%: build
 	$(SLS) invoke $(INVOKE_ARGS) -f $* -d $(data)
 
-invoke-find-used-instance-types: data='{ "region": "$(region)" }'
+invoke-find-unavailable-instance-types: data='{ "region": "$(region)" }'
 
 .PHONY: bash
 bash: build

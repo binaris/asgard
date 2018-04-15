@@ -1,9 +1,11 @@
 import json
 import pprint
+import traceback
+from datetime import datetime, timedelta
 import boto3
 
 def list_azs(region):
-    client = boto3.client("ec2")
+    client = boto3.client("ec2", region_name = region)
     azs = client.describe_availability_zones()
     names = [a['ZoneName'] for a in azs['AvailabilityZones']]
     return names
@@ -17,28 +19,75 @@ def find_lc_instance_types(region):
         for lc in page['LaunchConfigurations']:
             instance_type = lc['InstanceType']
             types.add(instance_type)
-            print ("found lc %s -> %s" % (lc['LaunchConfigurationName'], instance_type))
+            # print ("found lc %s -> %s" % (lc['LaunchConfigurationName'], instance_type))
     types = list(types)
     sorted(types)
     return types
 
-def find_used_instance_types(event, context):
-    region = event['region']
+def get_spot_history(region, types):
+
+    client = boto3.client('ec2', region_name = region)
+    paginator = client.get_paginator('describe_spot_price_history')
+    since = datetime.utcnow() - timedelta(hours=1)
+    print('Fetching spot price history since %s' % (str(since)))
+    pages = paginator.paginate(
+        InstanceTypes=types,
+        Filters=[
+            {
+                'Name': 'product-description',
+                'Values': ['Linux/UNIX'],
+            }
+        ]
+    )
+
+    types_in_azs = dict()
 
 
-    print("Looking for instance types used in region %s" % region)
+    for page in pages:
+        for record in page['SpotPriceHistory']:
+            t = record['InstanceType']
+            az = record['AvailabilityZone']
+            if az not in types_in_azs:
+                types_in_azs[az] = set()
+            types_in_azs[az].add(t)
+
+    return { az: list(types) for az, types in types_in_azs.items() }
+
+
+def find_types_missing_in_azs(used_types, azs, available_types):
+    ret = dict()
+    for used_type in used_types:
+        for az in azs:
+            if used_type not in available_types[az]:
+                print("Type %s in-use but not available in %s" % (used_type, az))
+                if az not in ret:
+                    ret[used_type] = [az]
+                else:
+                    ret[used_type].append(az)
+    return ret
+
+def find_unavailable_instance_types(event, context):
     try:
-        types = find_lc_instance_types(region)
+        region = event['region']
+        if not region:
+            raise Exception('region must be passed in')
+
+        print("Looking for instance types used in region %s" % region)
+        used_types = find_lc_instance_types(region)
+        print("Instance types used in region %s: %s" % (region, ",".join(used_types)))
         azs = list_azs(region)
-        pprint.pprint(azs)
+        print("AZs in region %s: %s" % (region, ",".join(azs)))
+        history = get_spot_history(region, used_types)
+        print("Spots available in each AZ: %s" % json.dumps(history, indent=1))
+        unavailable_types = find_types_missing_in_azs(used_types, azs, history)
+        return {
+            "statusCode": 200,
+            "body": unavailable_types
+        }
 
     except Exception as e:
         return {
             "statusCode": 500,
-            "body": str(e),
+            "body": traceback.format_exc(),
         }
 
-    return {
-        "statusCode": 200,
-        "body": types
-    }

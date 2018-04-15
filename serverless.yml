@@ -55,8 +55,8 @@ package:
     - node_modules/**
 
 functions:
-  find-used-instance-types:
-    handler: functions.find_used_instance_types
+  find-unavailable-instance-types:
+    handler: functions.find_unavailable_instance_types
     events:
 #      - http:
 #          path: users/create
