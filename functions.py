@@ -81,6 +81,20 @@ def http_error_handling(func):
             }
     return func_wrapper
 
+def list_asgs(region):
+
+    client = boto3.client('autoscaling', region_name = region)
+    paginator = client.get_paginator('describe_auto_scaling_groups')
+    asgs = []
+    for page in paginator.paginate():
+        for group in page['AutoScalingGroups']:
+            asgs.append({
+                "asg": group['AutoScalingGroupName'],
+                "lc": group['LaunchConfigurationName'],
+                "subnets": group['VPCZoneIdentifier'].split(","),
+            })
+
+    return asgs
 
 @http_error_handling
 def find_unavailable_instance_types(event, context):
@@ -96,5 +110,7 @@ def find_unavailable_instance_types(event, context):
     history = get_spot_history(region, used_types)
     print("Spots available in each AZ: %s" % json.dumps(history, indent=1))
     unavailable_types = find_types_missing_in_azs(used_types, azs, history)
+
+    pprint.pprint(list_asgs(region))
     return unavailable_types
 
