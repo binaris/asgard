@@ -7,9 +7,13 @@ RUN mkdir -p /app
 WORKDIR /app
 
 RUN npm install serverless
+RUN npm install serverless-iam-roles-per-function
+
 ENV PATH=/app/node_modules/.bin:$PATH
 
+RUN pip install -U pip
 RUN pip install boto3
+
 
 COPY serverless.yml ./
 COPY *.py ./

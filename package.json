@@ -1,0 +1,20 @@
+{
+  "name": "asgard",
+  "version": "1.0.0",
+  "description": "A Lambda function that monitors ASGs and protects them against spot-instance unavailability",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/binaris/asgard.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/binaris/asgard/issues"
+  },
+  "homepage": "https://github.com/binaris/asgard#readme",
+  "devDependencies": {
+    "serverless": "^1.26.1",
+    "serverless-iam-roles-per-function": "^0.1.5"
+  }
+}

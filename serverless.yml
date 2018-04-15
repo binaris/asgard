@@ -17,6 +17,9 @@ service: asgard
 # Check out our docs for more details
 # frameworkVersion: "=X.X.X"
 
+plugins:
+  - serverless-iam-roles-per-function
+
 provider:
   name: aws
   runtime: python3.6
@@ -29,13 +32,6 @@ provider:
   timeout: 60
 
 # you can add statements to the Lambda function's IAM Role here
-  iamRoleStatements:
-    - Effect: "Allow"
-      Action:
-        - "autoscaling:DescribeLaunchConfigurations"
-        - "ec2:DescribeAvailabilityZones"
-        - "ec2:DescribeSpotPriceHistory"
-      Resource: "*"
 #    - Effect: "Allow"
 #      Action:
 #        - "s3:PutObject"
@@ -62,6 +58,13 @@ package:
 functions:
   find-unavailable-instance-types:
     handler: functions.find_unavailable_instance_types
+    iamRoleStatements:
+        - Effect: "Allow"
+          Action:
+              - "autoscaling:DescribeLaunchConfigurations"
+              - "ec2:DescribeAvailabilityZones"
+              - "ec2:DescribeSpotPriceHistory"
+          Resource: "*"
     events:
 #      - http:
 #          path: users/create
