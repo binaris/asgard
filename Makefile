@@ -50,3 +50,6 @@ logs-%: build
 deploy-%: build
 	$(SLS) deploy function -f $* -s $(stage)
 
+remove: build
+	$(SLS) remove -s $(stage)
+
