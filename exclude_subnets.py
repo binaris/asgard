@@ -55,7 +55,6 @@ def handler(event, context):
         'Value': 'true',
         'PropagateAtLaunch': False,
     } for t in excluded_subnet_tags]
-    print(json.dumps(tags))
 
     client.create_or_update_tags(Tags=tags)
     client.update_auto_scaling_group(
