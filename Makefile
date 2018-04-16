@@ -25,7 +25,7 @@ build:
 
 .PHONY: lint
 lint: build
-	$(DOCKER) run $(DOCKERARGS) -t --rm $(IMAGE) pep8 *.py
+	$(DOCKER) run $(DOCKERARGS) -t --rm --entrypoint pep8 $(IMAGE) *.py
 
 invoke-local-%: build
 	$(SLS) invoke local $(INVOKE_ARGS) -f $* -p input.json $(data) -s $(stage)
