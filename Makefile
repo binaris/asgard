@@ -11,11 +11,11 @@ IMAGE := binaris/asgard
 DOCKERARGS := -e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
 	-e AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY)
 
-SLS := sudo docker run $(DOCKERARGS) -t --rm $(IMAGE)
-
 FUNCTIONS := find-unavailable-instance-types patch-asg exclude-subnets
 
 DOCKER := sudo docker
+
+SLS := $(DOCKER) run $(DOCKERARGS) -t --rm $(IMAGE)
 
 stage ?= dev
 
