@@ -17,9 +17,9 @@ def http_error_handling(func):
             }
     return func_wrapper
 
-def invoke(func, params):
+def invoke(func, params, stage):
     client = boto3.client('lambda')
-    client.invoke(FunctionName=func,
+    client.invoke(FunctionName="asgard-%s-%s" % (stage, func),
                   InvocationType="Event",
                   Payload=bytes(json.dumps(params), "utf8")
                   )

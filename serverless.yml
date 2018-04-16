@@ -30,6 +30,8 @@ provider:
 
   memorySize: 512
   timeout: 60
+  environment:
+      stage: ${self:provider.stage}
 
 # you can define service wide environment variables here
 #  environment:

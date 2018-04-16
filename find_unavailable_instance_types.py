@@ -3,6 +3,7 @@ import pprint
 from datetime import datetime, timedelta
 import boto3
 from utils import http_error_handling, invoke
+import os
 
 def list_azs(region):
     client = boto3.client("ec2", region_name = region)
@@ -83,21 +84,25 @@ def list_asgs(region):
 
 @http_error_handling
 def handler(event, context):
+    stage = os.environ['stage']
     region = event['region']
     if not region:
         raise Exception('region must be passed in')
 
-    # print("Looking for instance types used in region %s" % region)
-    # used_types = find_lc_instance_types(region)
-    # print("Instance types used in region %s: %s" % (region, ",".join(used_types)))
-    # azs = list_azs(region)
-    # print("AZs in region %s: %s" % (region, ",".join(azs)))
-    # history = get_spot_history(region, used_types)
-    # print("Spots available in each AZ: %s" % json.dumps(history, indent=1))
-    # unavailable_types = find_types_missing_in_azs(used_types, azs, history)
+    print("Looking for instance types used in region %s" % region)
+    used_types = find_lc_instance_types(region)
+    print("Instance types used in region %s: %s" % (region, ",".join(used_types)))
+    azs = list_azs(region)
+    print("AZs in region %s: %s" % (region, ",".join(azs)))
+    history = get_spot_history(region, used_types)
+    print("Spots available in each AZ: %s" % json.dumps(history, indent=1))
+    unavailable_types = find_types_missing_in_azs(used_types, azs, history)
 
     asgs = list_asgs(region)
     for asg in asgs:
-        invoke("asgard-dev-patch-asg", asg);
-    return asgs
+        invoke("patch-asg", {
+            "asg": asg,
+            "region": region,
+            "unavailable_types": unavailable_types,
+        }, stage)
 

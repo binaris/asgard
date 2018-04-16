@@ -11,11 +11,13 @@ IMAGE := binaris/asgard
 DOCKERARGS := -e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
 	-e AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY)
 
-SLS := sudo docker run $(DOCKERARGS) -it --rm $(IMAGE)
+SLS := sudo docker run $(DOCKERARGS) -t --rm $(IMAGE)
 
 FUNCTIONS := find-unavailable-instance-types patch-asg
 
 DOCKER := sudo docker
+
+stage ?= dev
 
 .PHONY: build
 build:
@@ -25,7 +27,7 @@ invoke-local-%:
 	make invoke-$* INVOKE_ARGS=local
 
 invoke-%: build
-	$(SLS) invoke $(INVOKE_ARGS) -f $* -d $(data)
+	$(SLS) invoke $(INVOKE_ARGS) -f $* -d $(data) -s $(stage)
 
 invoke-find-unavailable-instance-types: data='{ "region": "$(region)" }'
 
@@ -33,16 +35,18 @@ invoke-find-unavailable-instance-types: data='{ "region": "$(region)" }'
 bash: build
 	$(DOCKER) run -it --rm $(DOCKERARGS) --entrypoint /bin/bash $(IMAGE)
 
+update-functions: deploy-find-unavailable-instance-types deploy-patch-asg
+
 .PHONY: deploy
 deploy: build
-	$(SLS) deploy
+	$(SLS) deploy -s $(stage)
 
 $(FUNCTIONS): %: deploy-% invoke-% invoke-local-% logs-%
 .PHONY: $(FUNCTIONS)
 
 logs-%: build
-	$(SLS) logs -f $* -t
+	$(SLS) logs -f $* -t -s $(stage)
 
 deploy-%: build
-	$(SLS) deploy function -f $*
+	$(SLS) deploy function -f $* -s $(stage)
 
