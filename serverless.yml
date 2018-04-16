@@ -28,7 +28,7 @@ provider:
   stage: dev
   region: us-east-1
 
-  memorySize: 512
+  memorySize: 128
   timeout: 60
   environment:
       stage: ${self:provider.stage}
@@ -49,6 +49,13 @@ package:
 functions:
   exclude-subnets:
     handler: exclude_subnets.handler
+    iamRoleStatements:
+        - Effect: "Allow"
+          Action:
+              - "autoscaling:DescribeLaunchConfigurations"
+              - "autoscaling:CreateOrUpdateTags"
+              - "autoscaling:UpdateAutoScalingGroup"
+          Resource: "*"
   patch-asg:
     handler: patch_asg.handler
     iamRoleStatements:

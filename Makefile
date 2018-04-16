@@ -24,12 +24,12 @@ build:
 	$(DOCKER) build -t $(IMAGE) .
 
 invoke-local-%: build
-	$(SLS) invoke local $(INVOKE_ARGS) -f $* -p input.json -s $(stage)
+	$(SLS) invoke local $(INVOKE_ARGS) -f $* -p input.json $(data) -s $(stage)
 
 invoke-%: build
-	$(SLS) invoke $(INVOKE_ARGS) -f $* -d $(data) -s $(stage)
+	$(SLS) invoke $(INVOKE_ARGS) -f $* $(data) -s $(stage) -p input.json
 
-invoke-find-unavailable-instance-types: data='{ "region": "$(region)" }'
+invoke-find-unavailable-instance-types: data='-d { "region": "$(region)" }'
 
 .PHONY: bash
 bash: build
