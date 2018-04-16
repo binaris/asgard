@@ -44,6 +44,20 @@ def handler(event, context):
     remaining = ",".join(list(remaining))
     print("Updating ASG %s to include only the following subnets: %s"
           % (asg, remaining))
+
+
+    excluded_subnet_tags = ["disabled-%s" % s for s in subnets_to_exclude]
+    print("Adding tags to ASG: " + ",".join(excluded_subnet_tags))
+    tags = [{
+        'ResourceId': asg,
+        'ResourceType': 'auto-scaling-group',
+        'Key': t,
+        'Value': 'true',
+        'PropagateAtLaunch': False,
+    } for t in excluded_subnet_tags]
+    print(json.dumps(tags))
+
+    client.create_or_update_tags(Tags=tags)
     client.update_auto_scaling_group(
         AutoScalingGroupName=asg,
         VPCZoneIdentifier=remaining
