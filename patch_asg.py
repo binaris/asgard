@@ -14,6 +14,7 @@ def map_subnets_to_azs(subnets):
 def handler(event, context):
     region = event['region']
     asg = event['asg']
+    print("patch-asg(%s)" %  asg['asg'])
     subnets = asg['subnets']
     unavailable_types = event['unavailable_types']
     subnet_to_az = map_subnets_to_azs(subnets)

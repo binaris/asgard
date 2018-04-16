@@ -4,8 +4,13 @@ import boto3
 
 @http_error_handling
 def handler(event, context):
+
     print(json.dumps(event))
     asg = event['asg']['asg']
+    print("Exclude-subnets(%s)" % asg)
+    if "prod" in asg:
+        print("Yikes! Not touching prod...")
+        return
     lc_name = event['asg']['lc']
     unavailable_types = event['unavailable_types']
     subnet_to_az = event['subnets']

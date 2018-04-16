@@ -19,9 +19,12 @@ def http_error_handling(func):
     return func_wrapper
 
 def invoke(func, params):
+    j = json.dumps(params)
+    stage = os.environ["stage"]
+    print("Invoking %s (stage: %s) with params: %s" % (func, stage, j))
     client = boto3.client('lambda')
-    client.invoke(FunctionName="asgard-%s-%s" % (os.environ["stage"], func),
+    client.invoke(FunctionName="asgard-%s-%s" % (stage, func),
                   InvocationType="Event",
-                  Payload=bytes(json.dumps(params), "utf8")
+                  Payload=bytes(j, "utf8")
                   )
 
