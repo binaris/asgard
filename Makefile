@@ -23,6 +23,10 @@ stage ?= dev
 build:
 	$(DOCKER) build -t $(IMAGE) .
 
+.PHONY: lint
+lint: build
+	$(DOCKER) run $(DOCKERARGS) -t --rm $(IMAGE) pep8 *.py
+
 invoke-local-%: build
 	$(SLS) invoke local $(INVOKE_ARGS) -f $* -p input.json $(data) -s $(stage)
 
