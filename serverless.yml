@@ -47,6 +47,8 @@ package:
     - node_modules/**
 
 functions:
+  exclude-subnets:
+    handler: exclude_subnets.handler
   patch-asg:
     handler: patch_asg.handler
     iamRoleStatements:
@@ -54,6 +56,7 @@ functions:
           Action:
               - "ec2:DescribeSubnets"
               - "ec2:DescribeSpotPriceHistory"
+              - "lambda:InvokeFunction"
           Resource: "*"
   find-unavailable-instance-types:
     handler: find_unavailable_instance_types.handler

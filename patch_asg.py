@@ -21,6 +21,7 @@ def handler(event, context):
         "subnets": subnet_to_az,
         "unavailable_types": unavailable_types,
         "asg": asg,
+        "region": region,
     })
 
     print(json.dumps(subnet_to_az, indent=2))

@@ -13,7 +13,7 @@ DOCKERARGS := -e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
 
 SLS := sudo docker run $(DOCKERARGS) -t --rm $(IMAGE)
 
-FUNCTIONS := find-unavailable-instance-types patch-asg
+FUNCTIONS := find-unavailable-instance-types patch-asg exclude-subnets
 
 DOCKER := sudo docker
 
@@ -23,8 +23,8 @@ stage ?= dev
 build:
 	$(DOCKER) build -t $(IMAGE) .
 
-invoke-local-%:
-	make invoke-$* INVOKE_ARGS=local
+invoke-local-%: build
+	$(SLS) invoke local $(INVOKE_ARGS) -f $* -p input.json -s $(stage)
 
 invoke-%: build
 	$(SLS) invoke $(INVOKE_ARGS) -f $* -d $(data) -s $(stage)

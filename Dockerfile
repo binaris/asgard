@@ -17,5 +17,6 @@ RUN pip install boto3
 
 COPY serverless.yml ./
 COPY *.py ./
+COPY *.json ./
 
 ENTRYPOINT ["/app/node_modules/.bin/sls"]
