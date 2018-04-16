@@ -1,6 +1,7 @@
 from utils import http_error_handling
 import json
 import boto3
+import os
 
 def get_lc_instance_type(client, lc_name):
     desc = client.describe_launch_configurations(
