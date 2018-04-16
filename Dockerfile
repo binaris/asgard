@@ -19,4 +19,4 @@ COPY serverless.yml ./
 COPY *.py ./
 COPY *.json ./
 
-CMD ["/app/node_modules/.bin/sls"]
+ENTRYPOINT ["/app/node_modules/.bin/sls"]
