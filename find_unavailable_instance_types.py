@@ -84,7 +84,6 @@ def list_asgs(region):
 
 @http_error_handling
 def handler(event, context):
-    stage = os.environ['stage']
     region = event['region']
     if not region:
         raise Exception('region must be passed in')
@@ -104,5 +103,5 @@ def handler(event, context):
             "asg": asg,
             "region": region,
             "unavailable_types": unavailable_types,
-        }, stage)
+        })
 

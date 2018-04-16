@@ -1,6 +1,29 @@
 import json
+import boto3
+from utils import invoke
+
+
+def map_subnets_to_azs(subnets):
+    client = boto3.client('ec2')
+    subnet_descs = client.describe_subnets(SubnetIds=subnets)
+    subnet_to_az = dict()
+    for subnet in subnet_descs["Subnets"]:
+        subnet_to_az[subnet["SubnetId"]] = subnet["AvailabilityZone"]
+    return subnet_to_az
+
 def handler(event, context):
-    print(json.dumps(event))
+    region = event['region']
+    asg = event['asg']
+    subnets = asg['subnets']
+    unavailable_types = event['unavailable_types']
+    subnet_to_az = map_subnets_to_azs(subnets)
+    invoke('exclude-subnets', {
+        "subnets": subnet_to_az,
+        "unavailable_types": unavailable_types,
+        "asg": asg,
+    })
+
+    print(json.dumps(subnet_to_az, indent=2))
     return {
         "statusCode": 200,
         "body": event,

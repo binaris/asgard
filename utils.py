@@ -1,6 +1,7 @@
 import traceback
 import boto3
 import json
+import os
 
 def http_error_handling(func):
     def func_wrapper(*args, **kwds):
@@ -17,9 +18,9 @@ def http_error_handling(func):
             }
     return func_wrapper
 
-def invoke(func, params, stage):
+def invoke(func, params):
     client = boto3.client('lambda')
-    client.invoke(FunctionName="asgard-%s-%s" % (stage, func),
+    client.invoke(FunctionName="asgard-%s-%s" % (os.environ["stage"], func),
                   InvocationType="Event",
                   Payload=bytes(json.dumps(params), "utf8")
                   )

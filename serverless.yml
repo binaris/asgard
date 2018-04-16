@@ -49,7 +49,12 @@ package:
 functions:
   patch-asg:
     handler: patch_asg.handler
-
+    iamRoleStatements:
+        - Effect: "Allow"
+          Action:
+              - "ec2:DescribeSubnets"
+              - "ec2:DescribeSpotPriceHistory"
+          Resource: "*"
   find-unavailable-instance-types:
     handler: find_unavailable_instance_types.handler
     iamRoleStatements:
