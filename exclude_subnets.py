@@ -41,8 +41,9 @@ def handler(event, context):
 
     print(json.dumps(event))
     asg = event['asg']['asg']
+    stage = os.environ['stage']
     print("Exclude-subnets(%s)" % asg)
-    if "prod" in asg:
+    if "prod" in asg and stage != 'prod':
         print("Yikes! Not touching prod...")
         return
     lc_name = event['asg']['lc']
