@@ -3,6 +3,7 @@ import boto3
 import json
 import os
 
+
 def http_error_handling(func):
     def func_wrapper(*args, **kwds):
         try:
@@ -18,6 +19,7 @@ def http_error_handling(func):
             }
     return func_wrapper
 
+
 def invoke(func, params):
     j = json.dumps(params)
     stage = os.environ["stage"]
@@ -27,4 +29,3 @@ def invoke(func, params):
                   InvocationType="Event",
                   Payload=bytes(j, "utf8")
                   )
-
