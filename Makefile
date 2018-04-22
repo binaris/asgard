@@ -38,8 +38,6 @@ invoke-local-%: build
 invoke-%: build
 	$(SLS) invoke $(INVOKE_ARGS) -f $* $(data) -s $(stage) -p input.json
 
-invoke-find-unavailable-instance-types: data='-d { "region": "$(region)" }'
-
 .PHONY: bash
 bash: build
 	$(DOCKER) run -it --rm $(DOCKERARGS) --entrypoint /bin/bash $(IMAGE)
