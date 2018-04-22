@@ -5,8 +5,8 @@ from utils import invoke
 monkey_patch_botocore_for_xray()
 
 
-def map_subnets_to_azs(subnets):
-    client = boto3.client('ec2')
+def map_subnets_to_azs(subnets, region):
+    client = boto3.client('ec2', region_name=region)
     subnet_descs = client.describe_subnets(SubnetIds=subnets)
     subnet_to_az = dict()
     for subnet in subnet_descs["Subnets"]:
@@ -20,7 +20,7 @@ def handler(event, context):
     print("patch-asg(%s)" % asg['asg'])
     subnets = asg['subnets']
     unavailable_types = event['unavailable_types']
-    subnet_to_az = map_subnets_to_azs(subnets)
+    subnet_to_az = map_subnets_to_azs(subnets, region)
     invoke('exclude-subnets', {
         "subnets": subnet_to_az,
         "unavailable_types": unavailable_types,
