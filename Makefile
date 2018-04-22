@@ -11,7 +11,9 @@ IMAGE := binaris/asgard
 DOCKERARGS := -e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
 	-e AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY)
 
-FUNCTIONS := find-unavailable-instance-types patch-asg exclude-subnets
+SLS := sudo docker run $(DOCKERARGS) -t --rm $(IMAGE)
+
+FUNCTIONS := find-unavailable-instance-types patch-asg exclude-subnets get-launch-config-instance-type
 
 DOCKER := sudo docker
 
@@ -42,7 +44,7 @@ invoke-%: build
 bash: build
 	$(DOCKER) run -it --rm $(DOCKERARGS) --entrypoint /bin/bash $(IMAGE)
 
-update-functions: deploy-find-unavailable-instance-types deploy-patch-asg
+update-functions: $(foreach func, $(FUNCTIONS), deploy-$(func))
 
 .PHONY: deploy
 deploy: build
