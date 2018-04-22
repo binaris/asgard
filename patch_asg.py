@@ -1,6 +1,8 @@
 import json
 import boto3
+from fleece.xray import monkey_patch_botocore_for_xray
 from utils import invoke
+monkey_patch_botocore_for_xray()
 
 
 def map_subnets_to_azs(subnets):

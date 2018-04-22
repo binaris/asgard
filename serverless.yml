@@ -6,17 +6,18 @@ service: asgard
 
 plugins:
   - serverless-iam-roles-per-function
+  - serverless-plugin-tracing
 
 provider:
   name: aws
   runtime: python3.6
   stage: dev
   region: us-east-1
-
+  tracing: true
   memorySize: 128
   timeout: 60
   environment:
-      stage: ${self:provider.stage}
+    stage: ${self:provider.stage}
 
 # you can define service wide environment variables here
 #  environment:
@@ -30,6 +31,8 @@ package:
   exclude:
     - .git/**
     - node_modules/**
+    - botocore/**
+    - boto3/**
 
 functions:
   exclude-subnets:
@@ -40,6 +43,7 @@ functions:
               - "autoscaling:DescribeLaunchConfigurations"
               - "autoscaling:CreateOrUpdateTags"
               - "autoscaling:UpdateAutoScalingGroup"
+              - "xray:Put*"
           Resource: "*"
   patch-asg:
     handler: patch_asg.handler
@@ -49,6 +53,7 @@ functions:
               - "ec2:DescribeSubnets"
               - "ec2:DescribeSpotPriceHistory"
               - "lambda:InvokeFunction"
+              - "xray:Put*"
           Resource: "*"
   find-unavailable-instance-types:
     handler: find_unavailable_instance_types.handler
@@ -60,6 +65,7 @@ functions:
               - "ec2:DescribeAvailabilityZones"
               - "ec2:DescribeSpotPriceHistory"
               - "lambda:InvokeFunction"
+              - "xray:Put*"
           Resource: "*"
     events:
       - schedule:
