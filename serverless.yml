@@ -35,6 +35,14 @@ package:
     - boto3/**
 
 functions:
+  get-launch-config-instance-type:
+    handler: get_lc_instance_type.handler
+    iamRoleStatements:
+        - Effect: "Allow"
+          Action:
+              - "autoscaling:DescribeLaunchConfigurations"
+              - "xray:Put*"
+          Resource: "*"
   exclude-subnets:
     handler: exclude_subnets.handler
     iamRoleStatements:
@@ -43,6 +51,7 @@ functions:
               - "autoscaling:DescribeLaunchConfigurations"
               - "autoscaling:CreateOrUpdateTags"
               - "autoscaling:UpdateAutoScalingGroup"
+              - "lambda:InvokeFunction"
               - "xray:Put*"
           Resource: "*"
   patch-asg:

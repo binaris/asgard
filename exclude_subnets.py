@@ -1,4 +1,4 @@
-from utils import http_error_handling
+from utils import http_error_handling, invoke
 import json
 import boto3
 from fleece.xray import monkey_patch_botocore_for_xray
@@ -59,7 +59,13 @@ def handler(event, context):
 
     client = boto3.client("autoscaling", region_name = region)
 
-    used_instance_type = get_lc_instance_type(client, lc_name)
+    used_instance_type = invoke("get-launch-config-instance-type",
+                                {
+                                    "region": region,
+                                    "lc": lc_name,
+                                },
+                                True)
+
     if used_instance_type not in unavailable_types:
         return False
 
