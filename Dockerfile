@@ -6,13 +6,14 @@ RUN curl -s -L https://raw.githubusercontent.com/binaris/711/master/ubuntu/node/
 RUN mkdir -p /app
 WORKDIR /app
 
-RUN npm install serverless
-RUN npm install serverless-iam-roles-per-function
+RUN pip install -U pip
+COPY requirements.txt .
+RUN pip install -r requirements.txt -t .
+
+COPY package.json .
+RUN npm install
 
 ENV PATH=/app/node_modules/.bin:$PATH
-
-RUN pip install -U pip
-RUN pip install boto3
 
 
 COPY serverless.yml ./
