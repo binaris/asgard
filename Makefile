@@ -11,17 +11,26 @@ IMAGE := binaris/asgard
 DOCKERARGS := -e AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
 	-e AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY)
 
-SLS := sudo docker run $(DOCKERARGS) -t --rm $(IMAGE)
-
 FUNCTIONS := find-unavailable-instance-types patch-asg exclude-subnets
 
 DOCKER := sudo docker
+
+SLS := $(DOCKER) run $(DOCKERARGS) -t --rm $(IMAGE)
+
+PEP8_CONF := --ignore=E201,E202,E251 --max-line-length=160
 
 stage ?= dev
 
 .PHONY: build
 build:
 	$(DOCKER) build -t $(IMAGE) .
+
+.PHONY: lint
+lint: build
+	$(DOCKER) run $(DOCKERARGS) -t --rm --entrypoint pep8 $(IMAGE) $(PEP8_CONF) *.py
+
+lint-fix:
+	autopep8 $(PEP8_CONF) --in-place *.py
 
 invoke-local-%: build
 	$(SLS) invoke local $(INVOKE_ARGS) -f $* -p input.json $(data) -s $(stage)

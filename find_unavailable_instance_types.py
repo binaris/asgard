@@ -5,11 +5,13 @@ import boto3
 from utils import http_error_handling, invoke
 import os
 
+
 def list_azs(region):
     client = boto3.client("ec2", region_name = region)
     azs = client.describe_availability_zones()
     names = [a['ZoneName'] for a in azs['AvailabilityZones']]
     return names
+
 
 def find_lc_instance_types(region):
     types = set()
@@ -24,6 +26,7 @@ def find_lc_instance_types(region):
     types = list(types)
     sorted(types)
     return types
+
 
 def get_spot_history(region, types):
 
@@ -42,7 +45,6 @@ def get_spot_history(region, types):
     )
 
     types_in_azs = dict()
-
 
     for page in pages:
         for record in page['SpotPriceHistory']:
@@ -67,6 +69,7 @@ def find_types_missing_in_azs(used_types, azs, available_types):
                     ret[used_type].append(az)
     return ret
 
+
 def list_asgs(region):
 
     client = boto3.client('autoscaling', region_name = region)
@@ -81,6 +84,7 @@ def list_asgs(region):
             })
 
     return asgs
+
 
 @http_error_handling
 def handler(event, context):
@@ -104,4 +108,3 @@ def handler(event, context):
             "region": region,
             "unavailable_types": unavailable_types,
         })
-

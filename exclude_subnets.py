@@ -3,6 +3,7 @@ import json
 import boto3
 import os
 
+
 def get_lc_instance_type(client, lc_name):
     desc = client.describe_launch_configurations(
         LaunchConfigurationNames=[lc_name]
@@ -14,6 +15,7 @@ def get_lc_instance_type(client, lc_name):
     print("%s uses instance type %s" % (lc_name, used_instance_type))
     return used_instance_type
 
+
 def find_subnets_to_exclude(unavailable, used, asg, subnet_to_az):
     unavailable_azs = unavailable[used]
     subnets_to_exclude = []
@@ -23,6 +25,7 @@ def find_subnets_to_exclude(unavailable, used, asg, subnet_to_az):
             subnets_to_exclude.append(subnet)
 
     return subnets_to_exclude
+
 
 def record_excluded_subnets_as_tags(subnets_to_exclude, client, asg):
     excluded_subnet_tags = ["disabled-%s" % s for s in subnets_to_exclude]
