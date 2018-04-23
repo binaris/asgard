@@ -7,6 +7,7 @@ monkey_patch_botocore_for_xray()
 
 cache = dict()
 
+
 def get_lc_instance_type(client, lc_name):
     desc = client.describe_launch_configurations(
         LaunchConfigurationNames=[lc_name]
@@ -18,6 +19,7 @@ def get_lc_instance_type(client, lc_name):
     print("%s uses instance type %s" % (lc_name, used_instance_type))
     return used_instance_type
 
+
 @http_error_handling
 def handler(event, context):
     region = event['region']
@@ -26,7 +28,7 @@ def handler(event, context):
     if lc in cache:
         return cache[lc]
 
-    client = boto3.client("autoscaling", region_name = region)
+    client = boto3.client("autoscaling", region_name=region)
     used_instance_type = get_lc_instance_type(client, lc)
     cache[lc] = used_instance_type
     return used_instance_type

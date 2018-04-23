@@ -6,6 +6,7 @@ import os
 
 monkey_patch_botocore_for_xray()
 
+
 def get_lc_instance_type(client, lc_name):
     desc = client.describe_launch_configurations(
         LaunchConfigurationNames=[lc_name]
@@ -57,7 +58,7 @@ def handler(event, context):
     subnet_to_az = event['subnets']
     region = event['region']
 
-    client = boto3.client("autoscaling", region_name = region)
+    client = boto3.client("autoscaling", region_name=region)
 
     used_instance_type = invoke("get-launch-config-instance-type",
                                 {

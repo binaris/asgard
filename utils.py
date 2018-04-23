@@ -20,6 +20,7 @@ def http_error_handling(func):
             }
     return func_wrapper
 
+
 @trace_xray_subsegment()
 def invoke(func, params, block=False):
     j = json.dumps(params)
@@ -27,13 +28,12 @@ def invoke(func, params, block=False):
     print("Invoking %s (stage: %s) with params: %s" % (func, stage, j))
     client = boto3.client('lambda')
     res = client.invoke(FunctionName="asgard-%s-%s" % (stage, func),
-                  InvocationType="RequestResponse" if block else "Event",
-                  Payload=bytes(j, "utf8")
-                  )
+                        InvocationType="RequestResponse" if block else "Event",
+                        Payload=bytes(j, "utf8")
+                        )
     if block:
         payload = res['Payload'].read()
         j = json.loads(payload)
         if j["statusCode"] != 200:
             raise Exception(payload)
         return j["body"]
-
