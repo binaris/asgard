@@ -55,7 +55,7 @@ def handler(event, context):
     subnet_to_az = event['subnets']
     region = event['region']
 
-    client = boto3.client("autoscaling", region_name=region)
+    client = boto3.client("autoscaling", region_name = region)
 
     used_instance_type = get_lc_instance_type(client, lc_name)
     if used_instance_type not in unavailable_types:
