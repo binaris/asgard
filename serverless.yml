@@ -11,13 +11,12 @@ plugins:
 provider:
   name: aws
   runtime: python3.6
-  stage: dev
   region: us-east-1
   tracing: true
   memorySize: 128
   timeout: 60
   environment:
-    stage: ${self:provider.stage}
+    stage: ${opt:stage}
 
 # you can define service wide environment variables here
 #  environment:
