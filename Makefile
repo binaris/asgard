@@ -17,6 +17,8 @@ DOCKER := sudo docker
 
 SLS := $(DOCKER) run $(DOCKERARGS) -t --rm $(IMAGE)
 
+PEP8_CONF := --ignore=E201,E202,E251 --max-line-length=160
+
 stage ?= dev
 
 .PHONY: build
@@ -25,7 +27,10 @@ build:
 
 .PHONY: lint
 lint: build
-	$(DOCKER) run $(DOCKERARGS) -t --rm --entrypoint pep8 $(IMAGE) *.py
+	$(DOCKER) run $(DOCKERARGS) -t --rm --entrypoint pep8 $(IMAGE) $(PEP8_CONF) *.py
+
+lint-fix:
+	autopep8 $(PEP8_CONF) --in-place *.py
 
 invoke-local-%: build
 	$(SLS) invoke local $(INVOKE_ARGS) -f $* -p input.json $(data) -s $(stage)
