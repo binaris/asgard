@@ -1,10 +1,8 @@
+import json
+from datetime import datetime, timedelta
 import boto3
 from fleece.xray import monkey_patch_botocore_for_xray
-import json
-import pprint
-from datetime import datetime, timedelta
 from utils import http_error_handling, invoke
-import os
 
 monkey_patch_botocore_for_xray()
 
@@ -92,7 +90,7 @@ def list_asgs(region):
 
 
 @http_error_handling
-def handler(event, context):
+def handler(event, _):
     region = event['region']
     if not region:
         raise Exception('region must be passed in')
