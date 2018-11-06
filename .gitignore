@@ -3,3 +3,4 @@ node_modules
 *.sw[n-z]
 .ropeproject
 input.json
+package-lock.json
