@@ -14,8 +14,8 @@
   },
   "homepage": "https://github.com/binaris/asgard#readme",
   "devDependencies": {
-    "serverless": "^1.26.1",
-    "serverless-iam-roles-per-function": "^0.1.5",
+    "serverless": "^1.32.0",
+    "serverless-iam-roles-per-function": "^0.1.9",
     "serverless-plugin-tracing": "^2.0.0"
   }
 }
